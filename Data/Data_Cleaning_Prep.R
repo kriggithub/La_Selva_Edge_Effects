@@ -57,17 +57,17 @@ la_selva_data$id <- str_to_upper(la_selva_data$id)
 
 # Trim activity
 la_selva_data$activity <- str_to_upper(str_trim(la_selva_data$activity))
+
 la_selva_data$activity[la_selva_data$activity == "T"] <- "L"
-la_selva_data$activity[la_selva_data$activity == "M"] <- "L"
 la_selva_data$activity[la_selva_data$activity == "OV" | la_selva_data$activity == "" | la_selva_data$activity == "ACTIVITY"] <- NA
 unique(la_selva_data$activity)
 
-# Update Distance to nearest neighbors
-la_selva_data$dist_NN[la_selva_data$dist_NN == "" | la_selva_data$dist_NN == ">10"] <- NA
+# Update Distance to nearest neighbors ()
+la_selva_data$dist_NN[la_selva_data$dist_NN == "" | la_selva_data$dist_NN == ">10"] <- 13.4
 
 unique(la_selva_data$dist_NN)
 
-
+table(la_selva_data$dist_NN)
 
 
 # Create column for edge type
