@@ -34,7 +34,49 @@ resting_null_model <- glmmTMB(
 summary(resting_null_model)
 
 rest_est_ci <- emmeans(resting_model, ~ edge_type, type = "response")
+rest_est_ci <- as.data.frame(rest_est_ci)
+rest_est_ci$edge_type <- as.character(rest_est_ci$edge_type)
+rest_est_ci$edge_type[rest_est_ci$edge_type == "I"] <- "Forest Interior"
+rest_est_ci$edge_type[rest_est_ci$edge_type == "A"] <- "Anthropogenic Edge"
+rest_est_ci$edge_type[rest_est_ci$edge_type == "B"] <- "Anthropogenic and Riparian Edge"
 rest_est_ci
+
+prob_rest_plot <- ggplot(rest_est_ci, 
+                         aes(x = factor(edge_type, levels = c("Forest Interior",
+                                                              "Anthropogenic Edge",
+                                                              "Anthropogenic and Riparian Edge")), 
+                             y = prob)) + 
+  geom_point(size = 4) +
+  geom_errorbar(aes(ymin = asymp.LCL, 
+                    ymax = asymp.UCL),
+                width = 0, 
+                linewidth = 1) +
+  labs(
+    x = "Forest Zone",
+    y = "Probability of Resting",
+  ) + 
+  theme_classic() +
+  theme(
+    axis.title = element_text(size = 16), 
+    axis.text = element_text(size = 14, color = "grey40"),
+    legend.title = element_text(size = 14),
+    legend.text = element_text(size = 12)
+  )
+
+
+prob_rest_plot
+
+# ggsave(
+#   plot = prob_rest_plot,
+#   "prob_rest_plot.png",
+#   width = 10,
+#   height = 8,
+#   dpi = 300
+# )
+
+
+
+
 
 
 # Feeding
@@ -52,9 +94,62 @@ feeding_null_model <- glmmTMB(
   )
 summary(feeding_null_model)
 
-
 feed_est_ci <- emmeans(feeding_model, ~ edge_type, type = "response")
+feed_est_ci <- as.data.frame(feed_est_ci)
+feed_est_ci$edge_type <- as.character(feed_est_ci$edge_type)
+feed_est_ci$edge_type[feed_est_ci$edge_type == "I"] <- "Forest Interior"
+feed_est_ci$edge_type[feed_est_ci$edge_type == "A"] <- "Anthropogenic Edge"
+feed_est_ci$edge_type[feed_est_ci$edge_type == "B"] <- "Anthropogenic and Riparian Edge"
 feed_est_ci
+
+prob_feed_plot <- ggplot(feed_est_ci, 
+                         aes(x = factor(edge_type, levels = c("Forest Interior",
+                                                              "Anthropogenic Edge",
+                                                              "Anthropogenic and Riparian Edge")), 
+                             y = prob)) + 
+  geom_point(size = 4) +
+  geom_errorbar(aes(ymin = asymp.LCL, 
+                    ymax = asymp.UCL),
+                width = 0, 
+                linewidth = 1) +
+  labs(
+    x = "Forest Zone",
+    y = "Probability of Feeding",
+  ) + 
+  theme_classic() +
+  theme(
+    axis.title = element_text(size = 16), 
+    axis.text = element_text(size = 14, color = "grey40"),
+    legend.title = element_text(size = 14),
+    legend.text = element_text(size = 12)
+  )
+
+
+prob_feed_plot
+
+# ggsave(
+#   plot = prob_feed_plot,
+#   "prob_feed_plot.png",
+#   width = 10,
+#   height = 8,
+#   dpi = 300
+# )
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -74,8 +169,56 @@ moving_null_model <- glmmTMB(
   )
 summary(moving_null_model)
 
+
 move_est_ci <- emmeans(moving_model, ~ edge_type, type = "response")
+move_est_ci <- as.data.frame(move_est_ci)
+move_est_ci$edge_type <- as.character(move_est_ci$edge_type)
+move_est_ci$edge_type[move_est_ci$edge_type == "I"] <- "Forest Interior"
+move_est_ci$edge_type[move_est_ci$edge_type == "A"] <- "Anthropogenic Edge"
+move_est_ci$edge_type[move_est_ci$edge_type == "B"] <- "Anthropogenic and Riparian Edge"
 move_est_ci
+
+prob_move_plot <- ggplot(move_est_ci, 
+                         aes(x = factor(edge_type, levels = c("Forest Interior",
+                                                              "Anthropogenic Edge",
+                                                              "Anthropogenic and Riparian Edge")), 
+                             y = prob)) + 
+  geom_point(size = 4) +
+  geom_errorbar(aes(ymin = asymp.LCL, 
+                    ymax = asymp.UCL),
+                width = 0, 
+                linewidth = 1) +
+  labs(
+    x = "Forest Zone",
+    y = "Probability of Moving",
+  ) + 
+  theme_classic() +
+  theme(
+    axis.title = element_text(size = 16), 
+    axis.text = element_text(size = 14, color = "grey40"),
+    legend.title = element_text(size = 14),
+    legend.text = element_text(size = 12)
+  )
+
+
+prob_move_plot
+
+# ggsave(
+#   plot = prob_move_plot,
+#   "prob_move_plot.png",
+#   width = 10,
+#   height = 8,
+#   dpi = 300
+# )
+
+
+
+
+
+
+
+
+
 
 
 
@@ -96,8 +239,56 @@ num_NN_null_model <- glmmTMB(
   )
 summary(num_NN_null_model)
 
+
+
 num_NN_est_ci <- emmeans(num_NN_model, ~ edge_type, type = "response")
+num_NN_est_ci <- as.data.frame(num_NN_est_ci)
+num_NN_est_ci$edge_type <- as.character(num_NN_est_ci$edge_type)
+num_NN_est_ci$edge_type[num_NN_est_ci$edge_type == "I"] <- "Forest Interior"
+num_NN_est_ci$edge_type[num_NN_est_ci$edge_type == "A"] <- "Anthropogenic Edge"
+num_NN_est_ci$edge_type[num_NN_est_ci$edge_type == "B"] <- "Anthropogenic and Riparian Edge"
 num_NN_est_ci
+
+mean_num_NN_plot <- ggplot(num_NN_est_ci, 
+                         aes(x = factor(edge_type, levels = c("Forest Interior",
+                                                              "Anthropogenic Edge",
+                                                              "Anthropogenic and Riparian Edge")), 
+                             y = rate)) + 
+  geom_point(size = 4) +
+  geom_errorbar(aes(ymin = asymp.LCL, 
+                    ymax = asymp.UCL),
+                width = 0, 
+                linewidth = 1) +
+  labs(
+    x = "Forest Zone",
+    y = "Mean Number of Nearest Neighbors within 5 m",
+  ) + 
+  theme_classic() +
+  theme(
+    axis.title = element_text(size = 16), 
+    axis.text = element_text(size = 14, color = "grey40"),
+    legend.title = element_text(size = 14),
+    legend.text = element_text(size = 12)
+  )
+
+
+mean_num_NN_plot
+
+# ggsave(
+#   plot = mean_num_NN_plot,
+#   "mean_num_NN_plot.png",
+#   width = 10,
+#   height = 8,
+#   dpi = 300
+# )
+
+
+
+
+
+
+
+
 
 
 # Distance to nearest neighbors
@@ -134,5 +325,45 @@ dist_df <- dist_df %>%
 
 dist_df
 
+
+
+dist_df$edge_type <- as.character(dist_df$edge_type)
+dist_df$edge_type[dist_df$edge_type == "I"] <- "Forest Interior"
+dist_df$edge_type[dist_df$edge_type == "A"] <- "Anthropogenic Edge"
+dist_df$edge_type[dist_df$edge_type == "B"] <- "Anthropogenic and Riparian Edge"
+dist_df
+
+mean_dist_NN_plot <- ggplot(dist_df, 
+                           aes(x = factor(edge_type, levels = c("Forest Interior",
+                                                                "Anthropogenic Edge",
+                                                                "Anthropogenic and Riparian Edge")), 
+                               y = mean_dist)) + 
+  geom_point(size = 4) +
+  geom_errorbar(aes(ymin = lower, 
+                    ymax = upper),
+                width = 0, 
+                linewidth = 1) +
+  labs(
+    x = "Forest Zone",
+    y = "Mean Distance to Nearest Neighbor (m)",
+  ) + 
+  theme_classic() +
+  theme(
+    axis.title = element_text(size = 16), 
+    axis.text = element_text(size = 14, color = "grey40"),
+    legend.title = element_text(size = 14),
+    legend.text = element_text(size = 12)
+  )
+
+
+mean_dist_NN_plot
+
+# ggsave(
+#   plot = mean_dist_NN_plot,
+#   "mean_dist_NN_plot.png",
+#   width = 10,
+#   height = 8,
+#   dpi = 300
+# )
 
 
