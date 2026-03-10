@@ -60,10 +60,15 @@ la_selva_data$activity <- str_to_upper(str_trim(la_selva_data$activity))
 
 la_selva_data$activity[la_selva_data$activity == "T"] <- "L"
 la_selva_data$activity[la_selva_data$activity == "OV" | la_selva_data$activity == "" | la_selva_data$activity == "ACTIVITY"] <- NA
+
+
+
 unique(la_selva_data$activity)
+table(la_selva_data$activity)
 
 # Update Distance to nearest neighbors ()
-la_selva_data$dist_NN[la_selva_data$dist_NN == "" | la_selva_data$dist_NN == ">10"] <- 13.4
+la_selva_data$dist_NN[la_selva_data$dist_NN == ""] <- NA
+la_selva_data$dist_NN[la_selva_data$dist_NN == ">10"] <- 13.4
 
 unique(la_selva_data$dist_NN)
 
