@@ -66,13 +66,13 @@ prob_rest_plot <- ggplot(rest_est_ci,
 
 prob_rest_plot
 
-# ggsave(
-#   plot = prob_rest_plot,
-#   "prob_rest_plot.png",
-#   width = 10,
-#   height = 8,
-#   dpi = 300
-# )
+ggsave(
+  plot = prob_rest_plot,
+  "prob_rest_plot.pdf",
+  width = 10,
+  height = 8,
+  dpi = 300
+)
 
 
 
@@ -102,6 +102,31 @@ feed_est_ci$edge_type[feed_est_ci$edge_type == "A"] <- "Anthropogenic Edge"
 feed_est_ci$edge_type[feed_est_ci$edge_type == "B"] <- "Anthropogenic and Riparian Edge"
 feed_est_ci
 
+
+
+
+feeding_model2 <- glmmTMB(
+  Feed ~ edge_type, 
+  data = la_selva_data, 
+  family = binomial(link = "logit")
+)
+summary(feeding_model2)
+
+
+feed_est_ci2 <- emmeans(feeding_model2, ~ edge_type, type = "response")
+feed_est_ci2 <- as.data.frame(feed_est_ci2)
+feed_est_ci2$edge_type <- as.character(feed_est_ci2$edge_type)
+feed_est_ci2$edge_type[feed_est_ci2$edge_type == "I"] <- "Forest Interior"
+feed_est_ci2$edge_type[feed_est_ci2$edge_type == "A"] <- "Anthropogenic Edge"
+feed_est_ci2$edge_type[feed_est_ci2$edge_type == "B"] <- "Anthropogenic and Riparian Edge"
+feed_est_ci2
+
+
+
+
+
+
+
 prob_feed_plot <- ggplot(feed_est_ci, 
                          aes(x = factor(edge_type, levels = c("Forest Interior",
                                                               "Anthropogenic Edge",
@@ -127,13 +152,13 @@ prob_feed_plot <- ggplot(feed_est_ci,
 
 prob_feed_plot
 
-# ggsave(
-#   plot = prob_feed_plot,
-#   "prob_feed_plot.png",
-#   width = 10,
-#   height = 8,
-#   dpi = 300
-# )
+ggsave(
+  plot = prob_feed_plot,
+  "prob_feed_plot.pdf",
+  width = 10,
+  height = 8,
+  dpi = 300
+)
 
 
 
@@ -203,13 +228,13 @@ prob_move_plot <- ggplot(move_est_ci,
 
 prob_move_plot
 
-# ggsave(
-#   plot = prob_move_plot,
-#   "prob_move_plot.png",
-#   width = 10,
-#   height = 8,
-#   dpi = 300
-# )
+ggsave(
+  plot = prob_move_plot,
+  "prob_move_plot.pdf",
+  width = 10,
+  height = 8,
+  dpi = 300
+)
 
 
 
@@ -274,13 +299,13 @@ mean_num_NN_plot <- ggplot(num_NN_est_ci,
 
 mean_num_NN_plot
 
-# ggsave(
-#   plot = mean_num_NN_plot,
-#   "mean_num_NN_plot.png",
-#   width = 10,
-#   height = 8,
-#   dpi = 300
-# )
+ggsave(
+  plot = mean_num_NN_plot,
+  "mean_num_NN_plot.pdf",
+  width = 10,
+  height = 8,
+  dpi = 300
+)
 
 
 
@@ -358,12 +383,12 @@ mean_dist_NN_plot <- ggplot(dist_df,
 
 mean_dist_NN_plot
 
-# ggsave(
-#   plot = mean_dist_NN_plot,
-#   "mean_dist_NN_plot.png",
-#   width = 10,
-#   height = 8,
-#   dpi = 300
-# )
+ggsave(
+  plot = mean_dist_NN_plot,
+  "mean_dist_NN_plot.pdf",
+  width = 10,
+  height = 8,
+  dpi = 300
+)
 
 

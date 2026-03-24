@@ -118,8 +118,7 @@ monkeyIdData <- la_selva_data %>%
                    RivDist = mean(riv_dist),
                    AnthDist = mean(anth_dist),
                    nObs = n())
-
-# write.csv(monkeyIdData, file = "monkeyIdData.csv")
+write.csv(monkeyIdData, file = "monkeyIdData.csv")
 
 
 
