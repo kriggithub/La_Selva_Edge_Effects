@@ -642,7 +642,7 @@ powerabcDistNNplot <-ggplot(rivBinDataDistNNSub, aes(x = wtAvgRivDist, y = wtAvg
 
 # logistic
 
-logisticDistNN <- nlsLM(wtAvgDistNN ~ a/(1+(b * exp(-c*(wtAvgRivDist)/400))) + d, data = rivBinDataDistNNSub, 
+logisticDistNN <- nlsLM(wtAvgDistNN ~ a/(1+(b * exp(-c*(wtAvgRivDist)/100))) + d, data = rivBinDataDistNNSub, 
                         start = list(a = 1.5, b = 130, c = 4.5, d = 3), weights = nMonkeys, control = nls.lm.control(maxiter = 1000))
 logisticDistNNAIC <- AIC(logisticDistNN)
 predData$logisticDistNN <- predict(logisticDistNN, newdata = predData)
