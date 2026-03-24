@@ -352,7 +352,7 @@ MovingPctpointLine <- data.frame(
 segmentedMovingPctplot <-ggplot(anthBinDataMovingSub, aes(x = wtAvgAnthDist, y = wtAvgMovingPct)) +
   geom_point() + 
   geom_errorbar(aes(ymin = wtAvgMovingPct - wtSeMovingPct, ymax = wtAvgMovingPct + wtSeMovingPct)) +
-  labs(x = "Distance to River Edge (m)", 
+  labs(x = "Distance to Anthropogenic Edge (m)", 
        y = "Mean Percent Time Spent Moving" 
        # title = paste0("Moving % (Segmented AIC = ", round(segmentedMovingPctAIC, 2), ")")
   ) +
@@ -438,7 +438,7 @@ allDEIplotsAnth <- ggarrange(logisticDistNNplot,
 
 allDEIplotsAnth
 
-# save.image(file = "anthDEImodels.RData")
+#save.image(file = "anthDEImodels.RData")
 
 
 ggexport(allDEIplotsAnth, filename = "allDEIplotsAnth.pdf", height = 15, width = 11)

@@ -38,61 +38,39 @@ rivBinDataDistNNSub <- rivBinData %>%
   filter(!is.na(wtAvgDistNN))
 ########################################################################################
 
-# Logistic AIC 74.95
-logisticDistNN <- nlsLM(wtAvgDistNN ~ a/(1+(b * exp(-c*(wtAvgRivDist)/100))) + d, data = rivBinDataDistNNSub, 
-                        start = list(a = 1.5, b = 130, c = 4.5, d = 3), weights = nMonkeys, control = nls.lm.control(maxiter = 1000))
-logisticDistNNAIC <- AIC(logisticDistNN)
-predData$logisticDistNN <- predict(logisticDistNN, newdata = predData)
+# Linear AIC 106.25
+linearDistNN <- lm(data = rivBinDataDistNNSub, formula = wtAvgDistNN ~ wtAvgRivDist, weights = nMonkeys)
+linearDistNNAIC <- AIC(linearDistNN)
+predData$linearDistNN <- predict(linearDistNN, newdata = predData)
 
 
+# DECREASING
+
+# max and min observed x
+DistNNxmin <- min(rivBinDataDistNNSub$wtAvgRivDist, na.rm = TRUE)
+DistNNxmax <- max(rivBinDataDistNNSub$wtAvgRivDist, na.rm = TRUE)
 
 
-# model coefficients to find point of inflection for logistic model
-DistNNCoefs <- coef(logisticDistNN)
-distb <- DistNNCoefs[["b"]]
-distc <- DistNNCoefs[["c"]]
-dista <- DistNNCoefs[["a"]]
-distd <- DistNNCoefs[["d"]]
+# model predicted y at that x
+DistNNymax <- predict(linearDistNN,
+                          newdata = data.frame(wtAvgRivDist = DistNNxmin))
+DistNNymin <- predict(linearDistNN,
+                          newdata = data.frame(wtAvgRivDist = DistNNxmax))
+# 
+DistNNydei <- DistNNymax - (2/3)*(DistNNymax - DistNNymin)
 
-distd
-
-distd + dista
-
-
-vcovMat <- vcov(logisticDistNN)
-
-
-
-# lower asymptote d
-se_lower_dm <- deltamethod(~ x4,
-                           mean = DistNNCoefs,
-                           cov  = vcovMat)
-lower_est <- distd
-lower_CI  <- lower_est + c(-1.96, 1.96) * se_lower_dm
-
-# upper asymptote a + d
-se_upper_dm <- deltamethod(~ x1 + x4,
-                           mean = DistNNCoefs,
-                           cov  = vcovMat)
-upper_est <- distd + dista
-upper_CI  <- upper_est + c(-1.96, 1.96) * se_upper_dm
+DistNNinvest <- invest(linearDistNN,
+                           seed = 123,
+                           y0 = DistNNydei,
+                           interval = "percentile",
+                           nsim = 10000,  
+                           boot.type = "nonparametric", 
+                           progress = TRUE)
 
 
-
-
-
-
-# Delta method
-DistNNse <- deltamethod(~ (100/x3) * log(x2), 
-                        mean = DistNNCoefs, 
-                        cov = vcovMat)
-
-
-
-
-DistNNPE <- ((log(distb)*100)/distc) # Point of inflection calculation from model coefficients
-DistNNlower <- DistNNPE - 1.96*DistNNse
-DistNNupper <- DistNNPE + 1.96*DistNNse
+DistNNPE <- as.numeric(DistNNinvest$estimate)
+DistNNlower <- as.numeric(DistNNinvest$lower)
+DistNNupper <- as.numeric(DistNNinvest$upper)
 
 DistNNciLabel <- paste0("95% CI = (", round(DistNNlower, 1), ", ", round(DistNNupper, 1), ")")
 DistNNpeLabel <- paste0("Point estimate = ", round(DistNNPE, 1))
@@ -113,15 +91,15 @@ DistNNpointLine <- data.frame(
 
 
 
-logisticDistNNplot <-ggplot(rivBinDataDistNNSub, aes(x = wtAvgRivDist, y = wtAvgDistNN)) +
+linearDistNNplot <-ggplot(rivBinDataDistNNSub, aes(x = wtAvgRivDist, y = wtAvgDistNN)) +
   geom_point() + 
   geom_errorbar(aes(ymin = wtAvgDistNN - wtSeDistNN, ymax = wtAvgDistNN + wtSeDistNN)) +
-  labs(x = "Distance to Anthropogenic Edge (m)", 
-       y = "Mean Distance to Nearest Neighbors"
-       # title = paste0("Resting % (Logistic AIC = ", round(logisticRestPctAIC, 2), ")")
+  labs(x = "Distance to Riparian Edge (m)", 
+       y = "Mean Distance to Nearest Neighbors" 
+       # title = paste0("DistNN % (Linear AIC = ", round(linearDistNNAIC, 2),")")
   ) +
   theme_bw() +
-  geom_line(data = predData, aes(y = logisticDistNN)) +
+  geom_line(data = predData, aes(y = linearDistNN)) +
   geom_rect(data = DistNNciBand,
             aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax, fill = type),
             alpha = 0.2, inherit.aes = FALSE) +
@@ -130,7 +108,7 @@ logisticDistNNplot <-ggplot(rivBinDataDistNNSub, aes(x = wtAvgRivDist, y = wtAvg
              linetype = "dashed", size = 0.8) +
   scale_fill_manual(values = setNames("red", DistNNciLabel)) +
   scale_color_manual(values = setNames("red", DistNNpeLabel)) +
-  labs(fill = NULL, color = NULL) +
+  labs(fill = NULL, color = NULL) + 
   theme(
     # legend.position = "bottom",               
     # legend.justification = "center",          
@@ -141,8 +119,13 @@ logisticDistNNplot <-ggplot(rivBinDataDistNNSub, aes(x = wtAvgRivDist, y = wtAvg
     legend.position = "none"
   )
 
+linearDistNNplot <- linearDistNNplot + axis_theme + spacing_theme
 
-logisticDistNNplot <- logisticDistNNplot + axis_theme + spacing_theme
+
+
+
+
+
 
 
 ########################################################################################
@@ -151,7 +134,8 @@ rivBinDataNumNNSub <- rivBinData %>%
   filter(!is.na(wtAvgNumNN))
 ########################################################################################
 
-# segmented
+# Segmented AIC 87.93
+
 linearNumNN <- lm(data = rivBinDataNumNNSub, formula = wtAvgNumNN ~ wtAvgRivDist, weights = nMonkeys)
 segmentedNumNN <- segmented(linearNumNN, seg.Z = ~ wtAvgRivDist, psi = 250)
 segmentedNumNNAIC<- AIC(segmentedNumNN)
@@ -188,7 +172,7 @@ NumNNpointLine <- data.frame(
 segmentedNumNNplot <-ggplot(rivBinDataNumNNSub, aes(x = wtAvgRivDist, y = wtAvgNumNN)) +
   geom_point() + 
   geom_errorbar(aes(ymin = wtAvgNumNN - wtSeNumNN, ymax = wtAvgNumNN + wtSeNumNN)) +
-  labs(x = "Distance to Anthropogenic Edge (m)", 
+  labs(x = "Distance to Riparian Edge (m)", 
        y = "Mean Number of Nearest Neighbors" 
        # title = paste0("Moving % (Segmented AIC = ", round(segmentedMovingPctAIC, 2), ")")
   ) +
@@ -223,90 +207,34 @@ rivBinDataFeedingSub <- rivBinData %>%
   filter(!is.na(wtAvgFeedingPct))
 ########################################################################################
 
-# linear
-linearFeedingPct <- lm(data = rivBinDataFeedingSub, formula = wtAvgFeedingPct ~ wtAvgRivDist, weights = nMonkeys)
-linearFeedingPctAIC <- AIC(linearFeedingPct)
-predData$linearFeedingPct <- predict(linearFeedingPct, newdata = predData)
+# null AIC 267.18
+nullFeedingPct <- lm(data = rivBinDataFeedingSub, formula = wtAvgFeedingPct ~ 1, weights = nMonkeys)
+nullFeedingPctAIC <- AIC(nullFeedingPct)
+predData$nullFeedingPct <- predict(nullFeedingPct, newdata = predData)
 
-
-
-
-# DECREASING
-
-# max and min observed x
-FeedingPctxmin <- min(rivBinDataFeedingSub$wtAvgRivDist, na.rm = TRUE)
-FeedingPctxmax <- max(rivBinDataFeedingSub$wtAvgRivDist, na.rm = TRUE)
-
-
-# model predicted y at that x
-FeedingPctymax <- predict(linearFeedingPct,
-                          newdata = data.frame(wtAvgRivDist = FeedingPctxmin))
-FeedingPctymin <- predict(linearFeedingPct,
-                          newdata = data.frame(wtAvgRivDist = FeedingPctxmax))
-# 
-FeedingPctydei <- FeedingPctymax - (2/3)*(FeedingPctymax - FeedingPctymin)
-
-FeedingPctinvest <- invest(linearFeedingPct,
-                           seed = 123,
-                           y0 = FeedingPctydei,
-                           interval = "percentile",
-                           nsim = 10000,  
-                           boot.type = "nonparametric", 
-                           progress = TRUE)
-
-
-FeedingPctPE <- as.numeric(FeedingPctinvest$estimate)
-FeedingPctlower <- as.numeric(FeedingPctinvest$lower)
-FeedingPctupper <- as.numeric(FeedingPctinvest$upper)
-
-FeedingPctciLabel <- paste0("95% CI = (", round(FeedingPctlower, 1), ", ", round(FeedingPctupper, 1), ")")
-FeedingPctpeLabel <- paste0("Point estimate = ", round(FeedingPctPE, 1))
-
-FeedingPctciBand <- data.frame(
-  xmin = FeedingPctlower,
-  xmax = FeedingPctupper,
-  ymin = -Inf,
-  ymax = Inf,
-  type = FeedingPctciLabel
-)
-
-FeedingPctpointLine <- data.frame(
-  xintercept = FeedingPctPE,
-  type = FeedingPctpeLabel
-)
-
-
-
-
-linearFeedingPctplot <-ggplot(rivBinDataFeedingSub, aes(x = wtAvgRivDist, y = wtAvgFeedingPct)) +
+nullFeedingPctplot <- ggplot(rivBinDataFeedingSub, aes(x = wtAvgRivDist, y = wtAvgFeedingPct)) +
   geom_point() + 
   geom_errorbar(aes(ymin = wtAvgFeedingPct - wtSeFeedingPct, ymax = wtAvgFeedingPct + wtSeFeedingPct)) +
-  labs(x = "Distance to Anthropogenic Edge (m)", 
+  labs(x = "Distance to Riparian Edge (m)", 
        y = "Mean Percent Time Spent Feeding" 
-       # title = paste0("Feeding % (Linear AIC = ", round(linearFeedingPctAIC, 2),")")
+       # title = paste0("Moving % (Null AIC = ", round(nullMovingPctAIC, 2), ")"),
+       # caption = "No DEI Effects"
   ) +
   theme_bw() +
-  geom_line(data = predData, aes(y = linearFeedingPct)) +
-  geom_rect(data = FeedingPctciBand,
-            aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax, fill = type),
-            alpha = 0.2, inherit.aes = FALSE) +
-  geom_vline(data = FeedingPctpointLine,
-             aes(xintercept = xintercept, color = type),
-             linetype = "dashed", size = 0.8) +
-  scale_fill_manual(values = setNames("red", FeedingPctciLabel)) +
-  scale_color_manual(values = setNames("red", FeedingPctpeLabel)) +
-  labs(fill = NULL, color = NULL) + 
+  geom_line(data = predData, aes(y = nullFeedingPct)) +
   theme(
-    # legend.position = "bottom",               
-    # legend.justification = "center",          
-    # legend.direction = "horizontal",          
-    # legend.box = "horizontal",                
-    # legend.background = element_blank(),
-    # legend.key = element_blank()
+    # legend.position = "bottom",
+    # legend.box = "horizontal",
+    # legend.key = element_blank(),
+    # legend.background = element_blank(),                           # remove legend
+    # plot.caption = element_text(hjust = 0.5, size = 10)  
     legend.position = "none"
   )
 
-linearFeedingPctplot <- linearFeedingPctplot + axis_theme + spacing_theme
+
+
+nullFeedingPctplot <- nullFeedingPctplot + axis_theme + spacing_theme
+
 
 
 ########################################################################################
@@ -315,7 +243,7 @@ rivBinDataMovingSub <- rivBinData %>%
   filter(!is.na(wtAvgMovingPct))
 ########################################################################################
 
-# segmented
+# segmented AIC 235.19
 linearMovingPct <- lm(data = rivBinDataMovingSub, formula = wtAvgMovingPct ~ wtAvgRivDist, weights = nMonkeys)
 segmentedMovingPct <- segmented(linearMovingPct, seg.Z = ~ wtAvgRivDist, psi = 250)
 segmentedMovingPctAIC<- AIC(segmentedMovingPct)
@@ -352,7 +280,7 @@ MovingPctpointLine <- data.frame(
 segmentedMovingPctplot <-ggplot(rivBinDataMovingSub, aes(x = wtAvgRivDist, y = wtAvgMovingPct)) +
   geom_point() + 
   geom_errorbar(aes(ymin = wtAvgMovingPct - wtSeMovingPct, ymax = wtAvgMovingPct + wtSeMovingPct)) +
-  labs(x = "Distance to River Edge (m)", 
+  labs(x = "Distance to Riparian Edge (m)", 
        y = "Mean Percent Time Spent Moving" 
        # title = paste0("Moving % (Segmented AIC = ", round(segmentedMovingPctAIC, 2), ")")
   ) +
@@ -398,7 +326,7 @@ predData$nullRestPct <- predict(nullRestPct, newdata = predData)
 nullRestPctplot <- ggplot(rivBinDataRestSub, aes(x = wtAvgRivDist, y = wtAvgRestPct)) +
   geom_point() + 
   geom_errorbar(aes(ymin = wtAvgRestPct - wtSeRestPct, ymax = wtAvgRestPct + wtSeRestPct)) +
-  labs(x = "Distance to Anthropogenic Edge (m)", 
+  labs(x = "Distance to Riparian Edge (m)", 
        y = "Mean Percent Time Spent Resting" 
        # title = paste0("Moving % (Null AIC = ", round(nullMovingPctAIC, 2), ")"),
        # caption = "No DEI Effects"
@@ -422,9 +350,9 @@ nullRestPctplot <- nullRestPctplot + axis_theme + spacing_theme
 
 
 
-allDEIplotsAnth <- ggarrange(logisticDistNNplot,
+allDEIplotsRiv <- ggarrange(linearDistNNplot,
                              segmentedNumNNplot,
-                             linearFeedingPctplot,
+                             nullFeedingPctplot,
                              segmentedMovingPctplot,
                              nullRestPctplot,
                              ncol = 2, nrow = 3,
@@ -436,12 +364,12 @@ allDEIplotsAnth <- ggarrange(logisticDistNNplot,
                              font.label = list(size = 20, face = "bold"))
 
 
-allDEIplotsAnth
+allDEIplotsRiv
 
 # save.image(file = "anthDEImodels.RData")
 
 
-ggexport(allDEIplotsAnth, filename = "allDEIplotsAnth.pdf", height = 15, width = 11)
+ggexport(allDEIplotsRiv, filename = "allDEIplotsRiv.pdf", height = 15, width = 11)
 
 
 

@@ -105,23 +105,6 @@ feed_est_ci
 
 
 
-feeding_model2 <- glmmTMB(
-  Feed ~ edge_type, 
-  data = la_selva_data, 
-  family = binomial(link = "logit")
-)
-summary(feeding_model2)
-
-
-feed_est_ci2 <- emmeans(feeding_model2, ~ edge_type, type = "response")
-feed_est_ci2 <- as.data.frame(feed_est_ci2)
-feed_est_ci2$edge_type <- as.character(feed_est_ci2$edge_type)
-feed_est_ci2$edge_type[feed_est_ci2$edge_type == "I"] <- "Forest Interior"
-feed_est_ci2$edge_type[feed_est_ci2$edge_type == "A"] <- "Anthropogenic Edge"
-feed_est_ci2$edge_type[feed_est_ci2$edge_type == "B"] <- "Anthropogenic and Riparian Edge"
-feed_est_ci2
-
-
 
 
 
@@ -164,6 +147,22 @@ ggsave(
 
 
 
+# Feeding model without random effect
+feeding_model2 <- glmmTMB(
+  Feed ~ edge_type, 
+  data = la_selva_data, 
+  family = binomial(link = "logit")
+)
+summary(feeding_model2)
+
+
+feed_est_ci2 <- emmeans(feeding_model2, ~ edge_type, type = "response")
+feed_est_ci2 <- as.data.frame(feed_est_ci2)
+feed_est_ci2$edge_type <- as.character(feed_est_ci2$edge_type)
+feed_est_ci2$edge_type[feed_est_ci2$edge_type == "I"] <- "Forest Interior"
+feed_est_ci2$edge_type[feed_est_ci2$edge_type == "A"] <- "Anthropogenic Edge"
+feed_est_ci2$edge_type[feed_est_ci2$edge_type == "B"] <- "Anthropogenic and Riparian Edge"
+feed_est_ci2
 
 
 
@@ -172,6 +171,40 @@ ggsave(
 
 
 
+
+prob_feed_plot2 <- ggplot(feed_est_ci2, 
+                         aes(x = factor(edge_type, levels = c("Forest Interior",
+                                                              "Anthropogenic Edge",
+                                                              "Anthropogenic and Riparian Edge")), 
+                             y = prob)) + 
+  geom_point(size = 4) +
+  geom_errorbar(aes(ymin = asymp.LCL, 
+                    ymax = asymp.UCL),
+                width = 0, 
+                linewidth = 1) +
+  labs(
+    x = "Forest Zone",
+    y = "Probability of Feeding (no random effect)",
+  ) + 
+  theme_classic() +
+  theme(
+    axis.title = element_text(size = 16), 
+    axis.text = element_text(size = 14, color = "grey40"),
+    legend.title = element_text(size = 14),
+    legend.text = element_text(size = 12)
+  )
+
+
+prob_feed_plot2
+
+
+ggsave(
+  plot = prob_feed_plot2,
+  "prob_feed_plot_no_re.pdf",
+  width = 10,
+  height = 8,
+  dpi = 300
+)
 
 
 
