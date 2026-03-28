@@ -18,6 +18,20 @@ la_selva_data <- read.csv("all_la_selva_data.csv")
 la_selva_data$edge_type <- factor(la_selva_data$edge_type)
 la_selva_data$edge_type <- relevel(la_selva_data$edge_type, ref = "I")
 
+la_selva_grouped <- la_selva_data %>% 
+  group_by(id)
+
+# code feed and not feed by 1
+
+
+feeding_grouped <- glm(
+  cbind(Feed, notFeed) ~ edge_type,
+  data = la_selva_grouped,
+  family = binomial(link = "logit")
+  )
+
+
+
 # Resting
 resting_model <- glmmTMB(
   Rest ~ edge_type + (1|id), 
