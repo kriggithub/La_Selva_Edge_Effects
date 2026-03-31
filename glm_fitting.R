@@ -8,6 +8,9 @@
 library(tidyverse)
 library(emmeans)
 library(multcomp)
+library(ggpubr)
+
+
 
 # Load data 
 la_selva_data <- read.csv("all_la_selva_data.csv")
@@ -80,7 +83,7 @@ resting_glm_plot <- ggplot(resting_glm_est_ci,
   theme_classic() +
   theme(
     axis.title = element_text(size = 16), 
-    axis.text = element_text(size = 14, color = "grey40"),
+    axis.text = element_text(size = 11, color = "grey40"),
     legend.title = element_text(size = 14),
     legend.text = element_text(size = 12)
   )
@@ -180,7 +183,7 @@ feeding_glm_plot <- ggplot(feeding_glm_est_ci,
   theme_classic() +
   theme(
     axis.title = element_text(size = 16), 
-    axis.text = element_text(size = 14, color = "grey40"),
+    axis.text = element_text(size = 11, color = "grey40"),
     legend.title = element_text(size = 14),
     legend.text = element_text(size = 12)
   )
@@ -228,6 +231,11 @@ moving_glm_null <- glm(
 moving_lht <- anova(moving_glm_null, moving_glm, test = "Chisq")
 moving_lht
 
+# Generalized linear hypothesis test
+moving_glht <- glht(moving_glm, linfct = mcp(edge_type = "Tukey")) # Tukey for all pairwise comparisons
+summary(moving_glht, test = adjusted("none"))
+
+
 
 moving_glm_est_ci <- emmeans(moving_glm, ~ edge_type, type = "response")
 moving_letters <- cld(moving_glm_est_ci, Letters = letters, adjust = "none")
@@ -263,7 +271,7 @@ moving_glm_plot <- ggplot(moving_glm_est_ci,
   theme_classic() +
   theme(
     axis.title = element_text(size = 16), 
-    axis.text = element_text(size = 14, color = "grey40"),
+    axis.text = element_text(size = 11, color = "grey40"),
     legend.title = element_text(size = 14),
     legend.text = element_text(size = 12)
   )
@@ -348,7 +356,7 @@ num_NN_glm_plot <- ggplot(num_NN_glm_est_ci,
   theme_classic() +
   theme(
     axis.title = element_text(size = 16), 
-    axis.text = element_text(size = 14, color = "grey40"),
+    axis.text = element_text(size = 11, color = "grey40"),
     legend.title = element_text(size = 14),
     legend.text = element_text(size = 12)
   )
@@ -437,7 +445,7 @@ dist_NN_glm_plot <- ggplot(
   theme_classic() +
   theme(
     axis.title = element_text(size = 16),
-    axis.text = element_text(size = 14, color = "grey40"),
+    axis.text = element_text(size = 11, color = "grey40"),
     legend.title = element_text(size = 14),
     legend.text = element_text(size = 12)
   )
@@ -452,6 +460,46 @@ dist_NN_glm_plot
 #   height = 8,
 #   dpi = 300
 # )
+
+
+
+
+# Final plots:
+
+behavior_glm_plots <- ggarrange(resting_glm_plot,
+                           feeding_glm_plot,
+                           moving_glm_plot,
+                             ncol = 2, nrow = 2,
+                             labels   = c("a", "b", "c"),        # panel letters
+                             label.x  = 0.01,                               # a little inset from left
+                             label.y  = 0.98,                               # near the top
+                             hjust    = 0,                                  # left aligned
+                             vjust    = 1,                                  # top aligned
+                             font.label = list(size = 20, face = "bold"))
+
+
+ggexport(behavior_glm_plots, filename = "behavior_glm_plots.pdf", height = 12, width = 15.5)
+
+
+
+cohesion_glm_plots <- ggarrange(num_NN_glm_plot,
+                                dist_NN_glm_plot,
+                                ncol = 2, nrow = 1,
+                                labels   = c("a", "b"),        # panel letters
+                                label.x  = 0.01,                               # a little inset from left
+                                label.y  = 0.98,                               # near the top
+                                hjust    = 0,                                  # left aligned
+                                vjust    = 1,                                  # top aligned
+                                font.label = list(size = 20, face = "bold"))
+
+
+ggexport(cohesion_glm_plots, filename = "cohesion_glm_plots.pdf", height = 6, width = 15.5)
+
+
+
+
+
+
 
 
 
