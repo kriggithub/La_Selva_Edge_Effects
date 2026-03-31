@@ -8,6 +8,8 @@ library(chngpt)
 library(minpack.lm)
 library(investr)
 library(msm)
+library(rcompanion)
+
 
 
 
@@ -111,6 +113,12 @@ DistNNpointLine <- data.frame(
 )
 
 
+# Pseudo
+nullDistNN <- lm(data = anthBinDataDistNNSub, formula = wtAvgDistNN ~ 1, weights = nMonkeys)
+
+DistNNPR2 <- nagelkerke(logisticDistNN, null = nullDistNN)
+DistNNPR2 <- DistNNPR2$Pseudo.R.squared.for.model.vs.null
+
 
 
 logisticDistNNplot <-ggplot(anthBinDataDistNNSub, aes(x = wtAvgAnthDist, y = wtAvgDistNN)) +
@@ -182,6 +190,23 @@ NumNNpointLine <- data.frame(
   type = NumNNpeLabel
 )
 
+
+
+
+
+# Calculate Cox & Snell Pseudo R2
+# numNNPR2 <- 1 - exp((2/n) * (lnL0 - lnL1))
+
+
+nullNumNN <- lm(data = anthBinDataNumNNSub, formula = wtAvgNumNN ~ 1, weights = nMonkeys)
+
+
+logLik(segmentedNumNN)
+logLik(nullNumNN)
+nrow(anthBinDataNumNNSub)
+
+numNNPR2 <- 1-exp((2/29)*(-36.66658-(-32.51691)))
+numNNPR2
 
 
 
@@ -277,6 +302,11 @@ FeedingPctpointLine <- data.frame(
 
 
 
+# Pseudo
+
+feedingPR2 <- nagelkerke(linearFeedingPct)
+feedingPR2 <- feedingPR2$Pseudo.R.squared.for.model.vs.null
+
 
 linearFeedingPctplot <-ggplot(anthBinDataFeedingSub, aes(x = wtAvgAnthDist, y = wtAvgFeedingPct)) +
   geom_point() + 
@@ -346,6 +376,21 @@ MovingPctpointLine <- data.frame(
   type = MovingPctpeLabel
 )
 
+
+
+# Calculate Cox & Snell Pseudo R2
+# pr2 <- 1 - exp((2/n) * (lnL0 - lnL1))
+
+
+nullMovingPct <- lm(data = anthBinDataMovingSub, formula = wtAvgMovingPct ~ 1, weights = nMonkeys)
+
+
+logLik(segmentedMovingPct)
+logLik(nullMovingPct)
+nrow(anthBinDataMovingSub)
+
+movingPR2 <- 1-exp((2/31)*(-96.63035-(-91.74935)))
+movingPR2
 
 
 
@@ -441,7 +486,7 @@ allDEIplotsAnth
 #save.image(file = "anthDEImodels.RData")
 
 
-ggexport(allDEIplotsAnth, filename = "allDEIplotsAnth.pdf", height = 15, width = 11)
+# ggexport(allDEIplotsAnth, filename = "allDEIplotsAnth.pdf", height = 15, width = 11)
 
 
 

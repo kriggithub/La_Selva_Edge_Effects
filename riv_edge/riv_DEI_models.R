@@ -8,6 +8,7 @@ library(chngpt)
 library(minpack.lm)
 library(investr)
 library(msm)
+library(rcompanion)
 
 
 
@@ -89,6 +90,10 @@ DistNNpointLine <- data.frame(
 )
 
 
+#Pseudo
+DistNNPR2 <- nagelkerke(linearDistNN)
+DistNNPR2 <- DistNNPR2$Pseudo.R.squared.for.model.vs.null
+
 
 
 linearDistNNplot <-ggplot(rivBinDataDistNNSub, aes(x = wtAvgRivDist, y = wtAvgDistNN)) +
@@ -165,6 +170,21 @@ NumNNpointLine <- data.frame(
   xintercept = NumNNPE,
   type = NumNNpeLabel
 )
+
+
+# Calculate Cox & Snell Pseudo R2
+# numNNPR2 <- 1 - exp((2/n) * (lnL0 - lnL1))
+
+
+nullNumNN <- lm(data = rivBinDataNumNNSub, formula = wtAvgNumNN ~ 1, weights = nMonkeys)
+
+
+logLik(segmentedNumNN)
+logLik(nullNumNN)
+nrow(rivBinDataNumNNSub)
+
+numNNPR2 <- 1-exp((2/35)*(-44.61018-(-38.96345)))
+numNNPR2
 
 
 
@@ -274,6 +294,20 @@ MovingPctpointLine <- data.frame(
   type = MovingPctpeLabel
 )
 
+# Calculate Cox & Snell Pseudo R2
+# numNNPR2 <- 1 - exp((2/n) * (lnL0 - lnL1))
+
+
+nullMovingPct <- lm(data = rivBinDataMovingSub, formula = wtAvgMovingPct ~ 1, weights = nMonkeys)
+
+
+logLik(segmentedMovingPct)
+logLik(nullMovingPct)
+nrow(rivBinDataMovingSub)
+
+movingPR2 <- 1-exp((2/36)*(-116.2742-(-112.5943)))
+movingPR2
+
 
 
 
@@ -369,7 +403,7 @@ allDEIplotsRiv
 # save.image(file = "anthDEImodels.RData")
 
 
-ggexport(allDEIplotsRiv, filename = "allDEIplotsRiv.pdf", height = 15, width = 11)
+# ggexport(allDEIplotsRiv, filename = "allDEIplotsRiv.pdf", height = 15, width = 11)
 
 
 
