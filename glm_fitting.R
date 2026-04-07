@@ -155,7 +155,7 @@ feeding_glm_est_ci$edge_type <- as.character(feeding_glm_est_ci$edge_type)
 feeding_glm_est_ci$edge_type[feeding_glm_est_ci$edge_type == "I"] <- "Forest Interior"
 feeding_glm_est_ci$edge_type[feeding_glm_est_ci$edge_type == "A"] <- "Anthropogenic Edge"
 feeding_glm_est_ci$edge_type[feeding_glm_est_ci$edge_type == "B"] <- "Anthropogenic and Riparian Edge"
-feeding_glm_est_ci$.group <- c("a","c","b")
+feeding_glm_est_ci$.group <- c("a","b","c")
 feeding_glm_est_ci
 
 
