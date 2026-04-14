@@ -19,17 +19,17 @@ length_number_data <- length_number_data %>%
     riv_dist = Raw.River.Distance,
     bout_length_s = Length.of.howl.bout.in.seconds,
     n_howls_in_bout = Howl.number.in.bout
-  ) %>% 
-  select(
+  ) %>%
+  dplyr::select(
     sample_id,
     anth_dist,
     riv_dist,
     bout_length_s,
     n_howls_in_bout
-  ) %>% 
+  ) %>%
   mutate(
     howl_per_min = ((n_howls_in_bout)/(bout_length_s))*60
-  ) %>% 
+  ) %>%
   drop_na()
 
 
@@ -77,7 +77,7 @@ bout_h_data <- bout_h_data %>%
     riv_dist = Raw.River.Distance..m.,
     roar_bout_per_h = roar.bouts.per.hour
   ) %>% 
-  select(
+  dplyr::select(
     sample_id,
     anth_dist,
     riv_dist,
@@ -86,6 +86,37 @@ bout_h_data <- bout_h_data %>%
   drop_na()
 
 
+
+
+anth_bout_h_data <- bout_h_data %>% 
+  mutate(bin = as.factor(ceiling(anth_dist / 15))) %>%
+  group_by(bin) %>% 
+  dplyr::summarise(
+    n_obs = n(),
+    avg_roar_bout_per_h = mean(roar_bout_per_h, na.rm = T),
+    sd_roar_bout_per_h = sd(roar_bout_per_h, na.rm = T),
+    se_roar_bout_per_h = sd_roar_bout_per_h / sqrt(n_obs),
+    avg_anth_dist = mean(anth_dist, na.rm = T)
+  ) %>% 
+  ungroup()
+
+
+
+riv_bout_h_data <- bout_h_data %>% 
+  mutate(bin = as.factor(ceiling(riv_dist / 15))) %>%
+  group_by(bin) %>% 
+  dplyr::summarise(
+    n_obs = n(),
+    avg_roar_bout_per_h = mean(roar_bout_per_h, na.rm = T),
+    sd_roar_bout_per_h = sd(roar_bout_per_h, na.rm = T),
+    se_roar_bout_per_h = sd_roar_bout_per_h / sqrt(n_obs),
+    avg_riv_dist = mean(riv_dist, na.rm = T)
+  ) %>% 
+  ungroup()
+
+
+# write.csv(anth_bout_h_data, file = "anth_roar_bout_per_h.csv")
+# write.csv(riv_bout_h_data, file = "riv_roar_bout_per_h.csv")
 
 
 
