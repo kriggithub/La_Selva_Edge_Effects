@@ -29,7 +29,7 @@ Analysis code for **how anthropogenic and riparian (river) forest edges affect h
 | `glmm_fitting.R` | Equivalent `glmmTMB` mixed models with a random effect for waypoint ID |
 | `glm_plots/`, `glmm_plots/` | Per-response estimate plots (resting, feeding, moving, number and distance of nearest neighbours) |
 | `behavior_glm_plots.pdf`, `cohesion_glm_plots.pdf` | Combined multi-panel GLM figures |
-| `anth_edge/` | Binned anthropogenic-edge data (`anthBinData.csv`), candidate model fitting (`anth_model_fitting.R`), DEI estimation (`anth_DEI_models.R`), saved workspace (`anthDEImodels.RData`), model comparison plots (`model_fit_plots/`) and the combined DEI figure (`allDEIplotsAnth.pdf`) |
+| `anth_edge/` | Binned anthropogenic-edge data (`anthBinData.csv`), candidate model fitting (`anth_model_fitting.R`), DEI estimation (`anth_DEI_models.R`), a locally generated workspace (`anthDEImodels.RData`, not tracked), model comparison plots (`model_fit_plots/`) and the combined DEI figure (`allDEIplotsAnth.pdf`) |
 | `riv_edge/` | Same structure for the riparian edge (`rivBinData.csv`, `riv_model_fitting.R`, `riv_DEI_models.R`, `allDEIplotsRiv.pdf`) |
 | `roaring_analysis/data/` | Raw roaring data (bout length and howls per bout; roar bouts per hour) and `data_prep.R`, which produces the binned files |
 | `roaring_analysis/anth_edge/`, `roaring_analysis/riv_edge/` | Binned roaring data per edge type, observation-weighted model fitting (`*_model_fitting.R`, plots in `n_obs_plots/`) and SE-weighted fitting (`se_fitting.R`, plots in `SE_plots/` / `se_plots/`) |
@@ -37,7 +37,7 @@ Analysis code for **how anthropogenic and riparian (river) forest edges affect h
 
 ## Reproducing the analysis
 
-Open `La_Selva_Edge_Effects.Rproj` in RStudio and install the packages below. Scripts read and write files by relative path, so set the working directory to each script's own folder before running it. Several `write.csv()` / `ggexport()` calls are commented out; uncomment them to regenerate the intermediate CSVs and PDFs.
+Open `La_Selva_Edge_Effects.Rproj` in RStudio and install the packages below. Scripts read and write files by relative path, so set the working directory to each script's own folder before running it. Several `write.csv()` / `ggexport()` calls are commented out; uncomment them to regenerate the intermediate CSVs and PDFs. The DEI scripts' `.RData` workspaces are not tracked; uncomment the `save.image()` line at the end of `anth_DEI_models.R` / `riv_DEI_models.R` to regenerate them.
 
 1. `Data/Data_Cleaning_Prep.R`: combined dataset and binned anthropogenic / riparian data
 2. `glm_fitting.R` and `glmm_fitting.R`: forest-zone comparisons
